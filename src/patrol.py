@@ -30,15 +30,15 @@ def getKey():												#key
 def callback(data):										
 	global stat
 	stat=data.status.status
-	print(stat)
-    #rospy.loginfo(rospy.get_caller_id() + " \n%s\n%s",)
+	rospy.loginfo(rospy.get_caller_id() + str(stat))
 
 def patrol_init():
 	global homedir
-	bag = rosbag.Bag("%s/owayeol/map1/path1/init.bag" % homedir)
+	wait=0
+	bag = rosbag.Bag("%s/owayeol/map%s/wait%s.bag" % (homedir,map_num,wait))
 	goal_publisher = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=1)
 	goal = PoseStamped()
-	print("init")
+	rospy.loginfo("init")
 	for topic, msg, t in bag.read_messages(topics=[]):
 		goal.header.stamp =rospy.Time.now()
 		goal.header.frame_id = "map"
@@ -50,9 +50,10 @@ def patrol():
 	global stat
 	global homedir
 	global way_num
+	global map_num
 	#for i in range(1,len(os.walk("%s/bagfiles" % homedir).next()[2])):
 	if stat==3:
-		bag = rosbag.Bag("%s/owayeol/map1/path1/waypoint%s.bag" % (homedir,way_num))
+		bag = rosbag.Bag("%s/owayeol/map%s/path1/waypoint%s.bag" % (homedir,map_num,way_num))
 		goal_publisher = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=2)
 		goal = PoseStamped()
 		for topic, msg, t in bag.read_messages(topics=[]):
@@ -63,7 +64,7 @@ def patrol():
 			goal_publisher.publish(goal)
 		stat=1
 		way_num+=1
-		if way_num==5:
+		if way_num==6:
 			way_num=1
 			
 	#rate.sleep()
@@ -91,21 +92,24 @@ if __name__=="__main__":
 	stat=3
 	way_num=1															#current waypoint
 	pause=False
+
+	map_num=rospy.get_param("mapnum")
+
 	rospy.init_node("patrol", anonymous=True)
 	rospy.Subscriber('/move_base/result', MoveBaseActionResult, callback)
 	rospy.loginfo("if you initialpose robot, press 'S'\n help 'h'")
+	patrol_init()
 	while True:
 		try:
 			key=getKey()
 			if (key=='s'):												#stop & start
-				patrol_init()
 				pause= not pause
-				print("run: "+str(pause))
+				rospy.loginfo("run: "+str(pause))
 			elif key=='k':
 				patrol_init()
 				exit()
 			elif key=='h':
-				print("""
+				rospy.loginfo("""
 				's' start/stop
 				'k' kill program
 				'h' help
