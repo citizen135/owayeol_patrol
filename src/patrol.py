@@ -21,9 +21,10 @@ pause=False
 
 map_num=rospy.get_param("mapnum","1")
 robot_num=rospy.get_param("robotnum","1")
+path_num=rospy.get_param("pathnum","1")
 
 stat=3
-way_last=len(os.walk("%s/bagfiles" % homedir).next()[2])			#waypoint number
+way_last=len(os.walk("%s/owayeol/map%s/path%s" % (homedir,map_num,path_num)).next()[2])			#waypoint number
 def getKey():												#key
     if os.name == 'nt':
       return msvcrt.getch()
@@ -45,8 +46,7 @@ def callback(data):
 
 def patrol_init():
 	global homedir
-	wait=0
-	bag = rosbag.Bag("%s/owayeol/map%s/wait%s.bag" % (homedir,map_num,wait))
+	bag = rosbag.Bag("%s/owayeol/map%s/wait%s.bag" % (homedir,map_num,robot_num))
 	goal_publisher = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=1)
 	goal = PoseStamped()
 	rospy.loginfo("init")
@@ -65,8 +65,7 @@ def patrol():
 	global way_last
 	#for i in range(1,len(os.walk("%s/bagfiles" % homedir).next()[2])):
 	if stat==3:
-		print("!!!!")
-		bag = rosbag.Bag("%s/owayeol/map%s/path1/waypoint%s.bag" % (homedir,map_num,way_num))
+		bag = rosbag.Bag("%s/owayeol/map%s/path%s/waypoint%s.bag" % (homedir,map_num,path_num,way_num))
 		goal_publisher = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=2)
 		goal = PoseStamped()
 		for topic, msg, t in bag.read_messages(topics=[]):
@@ -77,7 +76,7 @@ def patrol():
 			goal_publisher.publish(goal)
 		stat=1
 		way_num+=1
-		if way_num==way_last:
+		if way_num==way_last+1:
 			way_num=1
 			
 	#rate.sleep()

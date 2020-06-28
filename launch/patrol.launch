@@ -3,10 +3,12 @@
   <param name="mapnum" value="$(arg mapnum)"/>
   <arg name="robotnum" default="1"/>
   <param name="robotnum" value="$(arg robotnum)"/>
+  <arg name="pathnum" default="1"/>
+  <param name="pathnum" value="$(arg pathnum)"/>
   
   <!--arg name="map_file" default="$(env HOME)/owayeol/map$(arg mapnum)/map.yaml"/-->
 
-  <node pkg="owayeol" type="patrol.py" name="patrol">
+  <node pkg="owayeol" type="patrol.py" name="patrol" output="screen">
     <remap from="/move_base/cancel" 		to="/robot$(arg robotnum)/move_base/cancel" />
     <remap from="/move_base/result"             to="/robot$(arg robotnum)/move_base/result" />
     <remap from="/move_base_simple/goal"        to="/robot$(arg robotnum)/move_base_simple/goal" />
