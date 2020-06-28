@@ -4,8 +4,10 @@ import rospy
 import os, sys, select										#input key
 import time
 import move_base
+from actionlib_msgs.msg import GoalID
 from move_base_msgs.msg import MoveBaseActionResult
 from geometry_msgs.msg import PoseStamped
+
 from os.path import expanduser								#find homedir
 if os.name == 'nt':											#input key
   import msvcrt
@@ -13,6 +15,15 @@ else:
   import tty, termios
 #way_list=os.listdir("%s/bagfiles" % homedir)
 #rate = rospy.Rate(1) #10hz
+homedir=expanduser("~")
+way_num=1															#current waypoint
+pause=False
+
+map_num=rospy.get_param("mapnum","1")
+robot_num=rospy.get_param("robotnum","1")
+
+stat=3
+way_last=len(os.walk("%s/bagfiles" % homedir).next()[2])			#waypoint number
 def getKey():												#key
     if os.name == 'nt':
       return msvcrt.getch()
@@ -51,8 +62,10 @@ def patrol():
 	global homedir
 	global way_num
 	global map_num
+	global way_last
 	#for i in range(1,len(os.walk("%s/bagfiles" % homedir).next()[2])):
 	if stat==3:
+		print("!!!!")
 		bag = rosbag.Bag("%s/owayeol/map%s/path1/waypoint%s.bag" % (homedir,map_num,way_num))
 		goal_publisher = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=2)
 		goal = PoseStamped()
@@ -64,7 +77,7 @@ def patrol():
 			goal_publisher.publish(goal)
 		stat=1
 		way_num+=1
-		if way_num==6:
+		if way_num==way_last:
 			way_num=1
 			
 	#rate.sleep()
@@ -87,23 +100,24 @@ def patrol():
 if __name__=="__main__":
 	if os.name != 'nt':
 		settings = termios.tcgetattr(sys.stdin)
-	homedir=expanduser("~")
-	way_last=len(os.walk("%s/bagfiles" % homedir).next()[2])			#waypoint number
-	stat=3
-	way_num=1															#current waypoint
-	pause=False
-
-	map_num=rospy.get_param("mapnum")
 
 	rospy.init_node("patrol", anonymous=True)
 	rospy.Subscriber('/move_base/result', MoveBaseActionResult, callback)
 	rospy.loginfo("if you initialpose robot, press 'S'\n help 'h'")
 	patrol_init()
+	print(80)
 	while True:
 		try:
 			key=getKey()
 			if (key=='s'):												#stop & start
 				pause= not pause
+				stat=3
+				if (pause==False):
+					stop_publisher = rospy.Publisher('/move_base/cancel',GoalID, queue_size=1)
+					stop_publisher.publish()
+					way_num=way_num-1
+					if way_num==0:
+						way_num=1
 				rospy.loginfo("run: "+str(pause))
 			elif key=='k':
 				patrol_init()
