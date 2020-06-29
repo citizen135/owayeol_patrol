@@ -76,7 +76,7 @@ def patrol():
 			goal_publisher.publish(goal)
 		stat=1
 		way_num+=1
-		if way_num==way_last+1:
+		if way_num==way_last:
 			way_num=1
 			
 	#rate.sleep()
