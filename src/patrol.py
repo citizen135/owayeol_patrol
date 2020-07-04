@@ -105,7 +105,7 @@ if __name__=="__main__":
 	rospy.loginfo("if you initialpose robot, press 'S'\n help 'h'")
 	patrol_init()
 	print(80)
-	while True:
+	while not rospy.is_shutdown():
 		try:
 			key=getKey()
 			if (key=='s'):												#stop & start
@@ -129,5 +129,5 @@ if __name__=="__main__":
 				""")
 			if pause==True:
 				patrol()
-		except KeyboardInterrupt:
-			exit()
+		except rospy.ROSInterruptException:
+        		pass
