@@ -100,11 +100,10 @@ if __name__=="__main__":
 	if os.name != 'nt':
 		settings = termios.tcgetattr(sys.stdin)
 
-	rospy.init_node("patrol", anonymous=True)
+	rospy.init_node("patrol")
 	rospy.Subscriber('/move_base/result', MoveBaseActionResult, callback)
 	rospy.loginfo("if you initialpose robot, press 'S'\n help 'h'")
 	patrol_init()
-	print(80)
 	while not rospy.is_shutdown():
 		try:
 			key=getKey()

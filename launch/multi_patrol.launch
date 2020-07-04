@@ -9,6 +9,7 @@
   <!--arg name="map_file" default="$(env HOME)/owayeol/map$(arg mapnum)/map.yaml"/-->
 
   <node pkg="owayeol" type="patrol.py" name="patrol" output="screen">
+    <remap from="patrol" to="/robot$(arg robotnum)/patrol"/>
     <remap from="/move_base/cancel" 		to="/robot$(arg robotnum)/move_base/cancel" />
     <remap from="/move_base/result"             to="/robot$(arg robotnum)/move_base/result" />
     <remap from="/move_base_simple/goal"        to="/robot$(arg robotnum)/move_base_simple/goal" />

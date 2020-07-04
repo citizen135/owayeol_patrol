@@ -5,13 +5,16 @@ import sys
 from std_msgs.msg import String,Int8
 from owayeol.msg import ChangeRobot, YoloResult
 import rosnode
-#rosnode.get_node_names()
+
+##clear
 stamp=-1
 alert_robot=-1
 robot_num=[0]*3
 wait_num=[0]*3
+wait_num[1]=1
+##
 
-def callback(data):
+def ALERT(data):
     global stamp
     global alert_robot
     global catch
@@ -22,26 +25,31 @@ def callback(data):
         catch=data.catch
 
         changrobot_topic="/robot%s/changerobot" % first_wait
-        change_pub = rospy.Publisher(changrobot_topic, ChangeRobot, queue_size=10)
+        change_pub = rospy.Publisher(changrobot_topic, ChangeRobot, queue_size=1)
         change=ChangeRobot()
         change.way_robot=data.alert_robot
         change.wait_robot=first_wait
         change.path_num=data.path_num
         change_pub.publish(change)
+        rospy.loginfo(rospy.get_time())
+        print(change)
+        
     except ValueError:
         rospy.loginfo("no more wait robot")
     
 
 
 if __name__ == '__main__':
-    rospy.init_node('PatrolServer', anonymous=True)
-    rospy.Subscriber("/alert", YoloResult, callback)
+    rospy.init_node('PatrolServer')
+    rospy.Subscriber("/alert", YoloResult, ALERT)
+    ##clear
     ex=YoloResult()
-    ex.stamp=1
-    ex.alert_robot=1
-    ex.path_num=1
-    ex.catch=1
-    callback(ex)
+    ex.stamp=999
+    ex.alert_robot=999
+    ex.path_num=999
+    ex.catch=999
+    ALERT(ex)
+    ##
     while not rospy.is_shutdown():
         try:
             pass
