@@ -13,8 +13,8 @@ if os.name == 'nt':											#input key
   import msvcrt
 else:
   import tty, termios
-#way_list=os.listdir("%s/bagfiles" % homedir)
-#rate = rospy.Rate(1) #10hz
+
+
 homedir=expanduser("~")
 way_num=1															#current waypoint
 pause=False
@@ -39,7 +39,7 @@ def getKey():												#key
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
     return key
 
-def callback(data):										
+def arriverobot(data):										
 	global stat
 	stat=data.status.status
 	rospy.loginfo(rospy.get_caller_id() + str(stat))
@@ -101,7 +101,7 @@ if __name__=="__main__":
 		settings = termios.tcgetattr(sys.stdin)
 
 	rospy.init_node("patrol")
-	rospy.Subscriber('/move_base/result', MoveBaseActionResult, callback)
+	rospy.Subscriber('/move_base/result', MoveBaseActionResult, arriverobot)
 	rospy.loginfo("if you initialpose robot, press 'S'\n help 'h'")
 	patrol_init()
 	while not rospy.is_shutdown():
@@ -129,4 +129,4 @@ if __name__=="__main__":
 			if pause==True:
 				patrol()
 		except rospy.ROSInterruptException:
-        		pass
+				pass

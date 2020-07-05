@@ -15,6 +15,7 @@ add_message_files(
   FILES
   YoloResult.msg
   ChangeRobot.msg
+  RobotState.msg
 )
 
 #catkin_package(
