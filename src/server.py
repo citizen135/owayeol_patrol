@@ -10,7 +10,6 @@ stamp=-1
 alert_robot=-1
 robot_num=[0]*3
 wait_num=[0]*3
-wait_num[1]=1
 ##
 
 def ALERT(data):
@@ -36,7 +35,11 @@ def ALERT(data):
         rospy.loginfo("no more wait robot")
     
 def robotstate(data):
-    pass
+    global robot_num
+    global wait_num
+    #robot_num[robot_num]=data.
+    #wa
+
 
 if __name__ == '__main__':
     rospy.init_node('PatrolServer')

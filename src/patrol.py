@@ -7,9 +7,8 @@ import move_base
 from actionlib_msgs.msg import GoalID
 from move_base_msgs.msg import MoveBaseActionResult
 from geometry_msgs.msg import PoseStamped
-from std_msgs.msg import String
+from std_msgs.msg import String,Int8
 from owayeol.msg import RobotState
-
 from os.path import expanduser								#find homedir
 
 homedir=expanduser("~")
@@ -33,6 +32,10 @@ def arriverobot(data):
 def command(data):
 	global flag
 	flag=data.data
+
+def changepath(data):
+	global pathnum
+	pathnum=data.data
 
 
 def patrol_init():
@@ -103,6 +106,7 @@ if __name__=="__main__":
 	rospy.init_node("patrol")
 	rospy.Subscriber('/move_base/result', MoveBaseActionResult, arriverobot)
 	rospy.Subscriber('/maincommand', String, command)
+	rospy.Subscriber('/changepath', Int8, changepath)
 
 	rospy.loginfo("if you initialpose robot, press 'patrol'\n")
 	patrol_init()
@@ -130,6 +134,4 @@ if __name__=="__main__":
 			
 		except rospy.ROSInterruptException:
 			patrol_init()
-			run=-1
-			pubstate()
 			pass
