@@ -7,17 +7,16 @@ import move_base
 from actionlib_msgs.msg import GoalID
 from move_base_msgs.msg import MoveBaseActionResult
 from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import String
+from owayeol.msg import RobotState
 
 from os.path import expanduser								#find homedir
-if os.name == 'nt':											#input key
-  import msvcrt
-else:
-  import tty, termios
-
 
 homedir=expanduser("~")
 way_num=1															#current waypoint
 pause=False
+flag="start"
+run=0
 
 map_num=rospy.get_param("mapnum","1")
 robot_num=rospy.get_param("robotnum","1")
@@ -25,31 +24,23 @@ path_num=rospy.get_param("pathnum","1")
 
 stat=3
 way_last=len(os.walk("%s/owayeol/map%s/path%s" % (homedir,map_num,path_num)).next()[2])			#waypoint number
-def getKey():												#key
-    if os.name == 'nt':
-      return msvcrt.getch()
-
-    tty.setraw(sys.stdin.fileno())
-    rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
-    if rlist:
-        key = sys.stdin.read(1)
-    else:
-        key = ''
-
-    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
-    return key
 
 def arriverobot(data):										
 	global stat
 	stat=data.status.status
 	rospy.loginfo(rospy.get_caller_id() + str(stat))
 
+def command(data):
+	global flag
+	flag=data.data
+
+
 def patrol_init():
 	global homedir
 	bag = rosbag.Bag("%s/owayeol/map%s/wait%s.bag" % (homedir,map_num,robot_num))
 	goal_publisher = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=1)
 	goal = PoseStamped()
-	rospy.loginfo("init")
+	run=0
 	for topic, msg, t in bag.read_messages(topics=[]):
 		goal.header.stamp =rospy.Time.now()
 		goal.header.frame_id = "map"
@@ -79,6 +70,17 @@ def patrol():
 		if way_num==way_last:
 			way_num=1
 			
+def pubstate(event):
+	global robot_num
+	global path_num
+	global run
+	robotstate_pub = rospy.Publisher('/robotstate', RobotState, queue_size=2)
+	robotstate=RobotState()
+	robotstate.robot_num=robot_num
+	robotstate.path_num=path_num
+	robotstate.run=run
+	robotstate_pub.publish(robotstate)
+
 	#rate.sleep()
 	#way_list.sort()
 	#for i in way_list:
@@ -97,17 +99,18 @@ def patrol():
 #             	rate.sleep()
 
 if __name__=="__main__":
-	if os.name != 'nt':
-		settings = termios.tcgetattr(sys.stdin)
 
 	rospy.init_node("patrol")
 	rospy.Subscriber('/move_base/result', MoveBaseActionResult, arriverobot)
-	rospy.loginfo("if you initialpose robot, press 'S'\n help 'h'")
+	rospy.Subscriber('/maincommand', String, command)
+
+	rospy.loginfo("if you initialpose robot, press 'patrol'\n")
 	patrol_init()
+	rospy.Timer(rospy.Duration(1), pubstate)
 	while not rospy.is_shutdown():
 		try:
-			key=getKey()
-			if (key=='s'):												#stop & start
+			
+			if (flag=='s'):												#stop & start
 				pause= not pause
 				stat=3
 				if (pause==False):
@@ -116,17 +119,17 @@ if __name__=="__main__":
 					way_num=way_num-1
 					if way_num==0:
 						way_num=1
-				rospy.loginfo("run: "+str(pause))
-			elif key=='k':
+				flag="start"
+			elif flag=='w':
 				patrol_init()
-				exit()
-			elif key=='h':
-				rospy.loginfo("""
-				's' start/stop
-				'k' kill program
-				'h' help
-				""")
+			elif flag=='p':
+				pause=True
+				run=1
 			if pause==True:
 				patrol()
+			
 		except rospy.ROSInterruptException:
-				pass
+			patrol_init()
+			run=-1
+			pubstate()
+			pass
