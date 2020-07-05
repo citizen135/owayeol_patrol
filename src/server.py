@@ -23,26 +23,26 @@ def ALERT(data):
         stamp=data.stamp                            #yolo add
         catch=data.catch
 
-        changrobot_topic="/robot%s/changerobot" % first_wait
-        change_pub = rospy.Publisher(changrobot_topic, ChangeRobot, queue_size=1)
-        change=ChangeRobot()
-        change.way_robot=data.alert_robot
-        change.wait_robot=first_wait
-        change.path_num=data.path_num
-        change_pub.publish(change)
-        rospy.loginfo(rospy.get_time())
+        changrobot_topic="/robot%s/changepath" % first_wait
+        #topic /robot%s/maincommand patrol??????
+        change_pub = rospy.Publisher(changrobot_topic, Int8, queue_size=1)
+        # change.way_robot=data.alert_robot
+        # change.wait_robot=first_wait
+        # change.path_num=data.path_num
+        change_pub.publish(data.path_num)
+        # rospy.loginfo(rospy.get_time())
         print(change)
         
     except ValueError:
         rospy.loginfo("no more wait robot")
     
 def robotstate(data):
-
+    pass
 
 if __name__ == '__main__':
     rospy.init_node('PatrolServer')
     rospy.Subscriber("/alert", YoloResult, ALERT)
-    rospy.Subscriber("/robotstate", YoloResult, ALERT)
+    rospy.Subscriber("/robotstate", RobotState, robotstate)
     ##clear
     ex=YoloResult()
     ex.stamp=999
