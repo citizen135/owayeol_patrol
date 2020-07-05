@@ -3,7 +3,7 @@ import rospy
 import time
 import sys
 from std_msgs.msg import String,Int8
-from owayeol.msg import ChangeRobot, YoloResult
+from owayeol.msg import ChangeRobot, YoloResult,RobotState
 
 ##clear
 stamp=-1
@@ -31,7 +31,6 @@ def ALERT(data):
         # change.path_num=data.path_num
         change_pub.publish(data.path_num)
         # rospy.loginfo(rospy.get_time())
-        print(change)
         
     except ValueError:
         rospy.loginfo("no more wait robot")
