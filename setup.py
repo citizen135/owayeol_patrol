@@ -8,4 +8,4 @@ setup_args = generate_distutils_setup(
     packages=['owayeol'],
     package_dir={'': 'src'})
 
-setup(**setup_args)s
+setup(**setup_args)

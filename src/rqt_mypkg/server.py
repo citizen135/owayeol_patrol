@@ -15,7 +15,7 @@ from python_qt_binding.QtGui import QIcon
 from python_qt_binding.QtWidgets import QMenu, QTreeWidgetItem, QWidget ,QMessageBox
 from PyQt5.QtWidgets import *
 from std_msgs.msg import String,Int8
-from owayeol.msg import ChangeRobot, YoloResult,RobotState
+from rqt_mypkg.msg import ChangeRobot, YoloResult,RobotState
 from darknet_ros_msgs.msg import BoundingBoxes
 
 import rospkg
@@ -80,7 +80,7 @@ class Server(QWidget):
         self.setObjectName('Server')
 
         rp = rospkg.RosPack()
-        ui_file = os.path.join(rp.get_path('owayeol'), 'resource', 'My1.ui')
+        ui_file = os.path.join(rp.get_path('rqt_mypkg'), 'resource', 'My1.ui')
         loadUi(ui_file, self)
         #self.call_button.setIcon(QIcon.fromTheme('call-start'))
         self.robot1.clicked.connect(self.robot1_button_clicked) 

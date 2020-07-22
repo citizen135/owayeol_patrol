@@ -8,7 +8,7 @@ from actionlib_msgs.msg import GoalID
 from move_base_msgs.msg import MoveBaseActionResult
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import String,Int8
-from owayeol.msg import RobotState
+from rqt_mypkg.msg import RobotState
 from os.path import expanduser								#find homedir
 
 homedir=expanduser("~")

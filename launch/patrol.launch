@@ -7,6 +7,7 @@
   <param name="pathnum" value="$(arg pathnum)"/>
   
   <!--arg name="map_file" default="$(env HOME)/owayeol/map$(arg mapnum)/map.yaml"/-->
+  <node pkg="owayeol" type="patrol.py" name="patrol" output="screen">
   </node>
 </launch>
  

@@ -9,6 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   std_msgs
   message_generation
+  rqt_gui
+  rqt_gui_py
 )
 
 add_message_files(
@@ -17,6 +19,8 @@ add_message_files(
   ChangeRobot.msg
   RobotState.msg
 )
+
+catkin_python_setup()
 
 #catkin_package(
 #  CATKIN_DEPENDS std_msgs message_runtime
@@ -30,4 +34,17 @@ generate_messages(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+)
+
+install(PROGRAMS scripts/owayeol
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+install(DIRECTORY
+  resource
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
+install(FILES
+  plugin.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
