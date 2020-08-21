@@ -31,7 +31,9 @@ import rospy
 from geometry_msgs.msg import Twist
 import move_base
 from std_msgs.msg import String,Int32,Header
-from sensor_msgs.msg import JointState
+from sensor_msgs.msg import JointState,Range
+from geometry_msgs.msg import PoseStamped
+import math
 
 import sys, select, os
 if os.name == 'nt':
@@ -67,6 +69,20 @@ CTRL-C to quit
 e = """
 Communications Failed
 """
+
+def point(data):
+    global servox
+    global servoy
+    global goal
+
+    goal = PoseStamped()
+    goal.header.stamp =rospy.Time.now()
+    goal.header.frame_id = "base"
+
+    goal.pose.position.x=data.range*math.cos(servox)*math.sin(servoy+1.57)
+    goal.pose.position.y=data.range*math.sin(servox)*math.sin(servoy+1.57)
+    goal.pose.position.z=0
+
 
 def getKey():
     if os.name == 'nt':
@@ -138,6 +154,9 @@ if __name__=="__main__":
     pub1 = rospy.Publisher('joint_states', JointState, queue_size=10)
     rospy.init_node('joint_state_publisher')
 
+    goal_publisher = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=2)
+    rospy.Subscriber("/range_data",Range,point)
+
     status = 0
     target_linear_vel   = 0.0
     target_angular_vel  = 0.0
@@ -201,7 +220,7 @@ if __name__=="__main__":
             elif key == 'b' :
                 servoy=servoy-0.01
             elif key == 'g' :
-                pass
+                goal_publisher.publish(goal)
 
             else:
                 if (key == '\x03'):
