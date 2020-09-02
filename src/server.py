@@ -24,6 +24,7 @@ import genpy
 
 from rqt_py_common.extended_combo_box import ExtendedComboBox
 
+
 number=1
 count=0
 #catch
@@ -319,6 +320,75 @@ wait_num[0]=1
 path_num=[0]*3
 ##
 
+global visited 
+global arr
+global patrol_point_list
+global finish_point
+arr = [[0,0,0,0,0,0,0,0,0,0]  
+      ,[0,0,1,0,1,0,0,0,0,0]
+      ,[0,1,0,1,0,1,0,0,0,0]
+      ,[0,0,1,0,0,0,1,0,0,0]
+      ,[0,1,0,0,0,1,0,1,0,0]
+      ,[0,0,1,0,1,0,1,0,1,0]
+      ,[0,0,0,1,0,1,0,0,0,1]
+      ,[0,0,0,0,1,0,0,0,1,0]
+      ,[0,0,0,0,0,1,0,1,0,1]
+      ,[0,0,0,0,0,0,1,0,1,0]]
+visited = [False,False,False,False,False,False,False,False,False,False] 
+
+def dfs(index):    
+    global visited 
+    global arr 
+    for i in range(1,len(arr)): 
+        if arr[index][i]==0 or visited[i]==True: 
+            continue
+        visited[i]=True 
+        dfs(i) 
+
+
+def search(start,cctv):
+    global visited 
+    global arr 
+    global patrol_point_list 
+    global finish_point 
+    patrol_point_list = [] 
+    finish_point = 0 
+    for i in range(1,len(arr)): 
+        for j in range(0,len(cctv)):
+            if arr[i][cctv[j]]==1:
+                arr[i][cctv[j]]=0
+   
+    for i in cctv:
+        for j in range(0,len(arr)): 
+            arr[i][j]=0
+
+    dfs(start) 
+    max = 0
+    for i in range(1,len(visited)):
+        count = 0
+        if visited[i] == True: 
+            patrol_point_list.append(i) 
+            for j in range(1,len(visited)): 
+                if arr[i][j] ==1: 
+                    count+=1
+            if count > max:
+                max = count
+                finish_point = i      
+    arr = [[0,0,0,0,0,0,0,0,0,0] 
+          ,[0,0,1,0,1,0,0,0,0,0]
+          ,[0,1,0,1,0,1,0,0,0,0]
+          ,[0,0,1,0,0,0,1,0,0,0]
+          ,[0,1,0,0,0,1,0,1,0,0]
+          ,[0,0,1,0,1,0,1,0,1,0]
+          ,[0,0,0,1,0,1,0,0,0,1]
+          ,[0,0,0,0,1,0,0,0,1,0]
+          ,[0,0,0,0,0,1,0,1,0,1]
+          ,[0,0,0,0,0,0,1,0,1,0]]
+    visited = [False,False,False,False,False,False,False,False,False,False]   
+
+    print("finish point: "+str(finish_point))
+    print("patrol points:"+str(patrol_point_list))
+
 def ALERT(data):
     global catch
     global wait_num
@@ -432,6 +502,9 @@ if __name__ == '__main__':
     global rb_num
     rospy.init_node('PatrolServer')
     print("start!!!!!!")
+    start = 3 
+    cctv=[2,5,8,9] 
+    search(start,cctv) 
     rospy.Subscriber("/darknet_ros/bounding_boxes",BoundingBoxes,ALERT)
     #os.chdir('/home/pjh/bag_dir/robot3')
     #os.system("rosbag record /cv_camera/image_raw/compressed &")  
