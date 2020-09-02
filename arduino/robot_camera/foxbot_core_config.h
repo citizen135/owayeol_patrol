@@ -59,9 +59,9 @@
 #define RATE_CONTROLLER_MAX_PWM 			500
 
 /* Mechanical parameters */
-#define WHEEL_RADIUS 						0.05 		// [m]
+#define WHEEL_RADIUS 						0.11 		// [m]
 // distance between the two wheels
-#define BASE_LENGTH 						0.37 		// [m]  0.288
+#define BASE_LENGTH 						0.25 		// [m]  0.288
 
 /* Define frequency loops */
 Timer _frequency_rate(FREQUENCY_RATE);
@@ -155,7 +155,7 @@ char odom_child_frame_id[30];
 // callback function prototype
 void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg);
 // message
-ros::Subscriber<geometry_msgs::Twist> cmd_vel_sub("/cmd_vel", commandVelocityCallback);
+ros::Subscriber<geometry_msgs::Twist> cmd_vel_sub("/robot3/cmd_vel", commandVelocityCallback);
 
 /* Odometry publisher */
 nav_msgs::Odometry odom;

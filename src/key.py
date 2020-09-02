@@ -81,6 +81,7 @@ def point(data):
 
     goal.pose.position.x=data.range*math.cos(servox)*math.sin(servoy+1.57)
     goal.pose.position.y=data.range*math.sin(servox)*math.sin(servoy+1.57)
+    goal.pose.orientation.w=0.976695505967
     goal.pose.position.z=0
 
 
@@ -154,7 +155,7 @@ if __name__=="__main__":
     pub1 = rospy.Publisher('joint_states', JointState, queue_size=10)
     rospy.init_node('joint_state_publisher')
 
-    goal_publisher = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=2)
+    goal_publisher = rospy.Publisher('/robot3/move_base_simple/goal', PoseStamped, queue_size=2)
     rospy.Subscriber("/range_data",Range,point)
 
     status = 0
